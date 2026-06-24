@@ -450,25 +450,7 @@
     }
 
     .help-top-action {
-      margin-top: 35px;
-      display: flex;
-      justify-content: center;
-    }
-
-    .help-top-action__btn {
-      width: 100%;
-      max-width: 330px;
-      padding-left: 30px;
-      padding-right: 30px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      text-decoration: none;
-      box-sizing: border-box;
-    }
-
-    .site-footer {
-      margin-top: 25px;
+      display: none;
     }
 
     .outline-modal {
@@ -764,7 +746,7 @@
       }
 
       .site-footer {
-        margin-top: 25px !important;
+        margin-top: 10px !important;
         padding: 30px 18px 16px;
         background-image: url("img/footer_mob.png");
         background-size: cover;
@@ -1106,7 +1088,7 @@
         <span class="help-text__label">Полностью очистить весь фрагмент</span> - кнопка ОЧИСТИТЬ ПОЛЕ
       </p>
       <div class="help-top-action">
-        <a class="mode-btn help-top-action__btn" href="instructions_step1.html">В НАЧАЛО ИНСТРУКЦИИ</a>
+        <a class="mode-btn help-top-action__btn" href="#page-top">В НАЧАЛО ИНСТРУКЦИИ</a>
       </div>
     </section>
   </div>
@@ -1386,7 +1368,7 @@
         undoButton.disabled = stepHistory.length === 0;
       }
       if (redoButton) {
-        redoButton.disabled = redoHistory.length === 0 && !canAdvancePendingSelection();
+        redoButton.disabled = redoHistory.length === 0;
       }
     }
 
@@ -1605,14 +1587,14 @@
       const isSelected = selectedBoardCells.has(index);
       const isPending = pendingBoardCells.has(index);
       const isSelectionAnchor = currentSelectionEndIndex === index;
-      const tileSrc = isSelectionAnchor
+      const tileSrc = isPending || isSelectionAnchor
         ? getBoardAnchorTileSrc(code)
         : getBoardTileSrc(code, isSelected);
 
       cell.style.backgroundImage = tileSrc ? `url("${tileSrc}")` : "none";
       cell.setAttribute("data-tile", code);
       cell.classList.toggle("is-selected", isSelected);
-      cell.classList.toggle("is-pending", isPending && isSelectionAnchor);
+      cell.classList.toggle("is-pending", isPending);
       cell.style.borderTop = "0";
       cell.style.borderRight = "0";
       cell.style.borderBottom = "0";
@@ -1630,51 +1612,20 @@
       return Array.from({ length: safeEndIndex + 1 }, (_, index) => index);
     }
 
-    function getNextFreeCellIndex(fromIndex) {
-      const startIndex = Math.max(0, Number.isInteger(fromIndex) ? fromIndex + 1 : 0);
-      for (let index = startIndex; index < size * size; index += 1) {
-        if (!selectedBoardCells.has(index)) {
-          return index;
-        }
-      }
-      return null;
-    }
-
-    function canAdvancePendingSelection() {
-      if (!Number.isInteger(currentSelectionEndIndex)) return false;
-      return getNextFreeCellIndex(currentSelectionEndIndex) !== null;
-    }
-
-    function syncPendingRangeToCurrentSelection() {
-      pendingBoardCells.clear();
-      if (!Number.isInteger(currentSelectionEndIndex)) return;
-      getRangeToCell(currentSelectionEndIndex).forEach((index) => {
-        if (!selectedBoardCells.has(index)) {
-          pendingBoardCells.add(index);
-        }
-      });
-    }
-
     function applySelectionRange(endIndex) {
       if (!Number.isInteger(endIndex) || endIndex < 0 || endIndex >= size * size) return;
 
       currentSelectionEndIndex = endIndex;
-      syncPendingRangeToCurrentSelection();
+      pendingBoardCells.clear();
+      getRangeToCell(endIndex).forEach((index) => {
+        if (!selectedBoardCells.has(index)) {
+          pendingBoardCells.add(index);
+        }
+      });
       redoHistory = [];
       setDisplayModeActive(false);
       repaintBoardCells();
       updateHistoryButtons();
-    }
-
-    function advancePendingSelection() {
-      if (!canAdvancePendingSelection()) return false;
-
-      currentSelectionEndIndex = getNextFreeCellIndex(currentSelectionEndIndex);
-      syncPendingRangeToCurrentSelection();
-      setDisplayModeActive(false);
-      repaintBoardCells();
-      updateHistoryButtons();
-      return true;
     }
 
     function commitDisplaySelection() {
@@ -1728,11 +1679,6 @@
       saveCurrentFragmentSelection();
     }
 
-    function handleNextButtonClick() {
-      if (advancePendingSelection()) return;
-      redoLastStep();
-    }
-
     function clearCurrentFragmentSelection() {
       stepHistory = [];
       redoHistory = [];
@@ -1769,7 +1715,7 @@
 
       if (redoButton) {
         redoButton.addEventListener("click", () => {
-          handleNextButtonClick();
+          redoLastStep();
         });
       }
 

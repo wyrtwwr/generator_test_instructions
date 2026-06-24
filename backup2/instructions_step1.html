@@ -103,22 +103,28 @@
       border: 1px solid #b4b4b4;
       display: block;
       position: relative;
-      background-position: center;
-      background-repeat: no-repeat;
-      background-size: cover;
     }
 
     .palette-chip__swatch::after {
-      content: none;
+      content: "";
+      position: absolute;
+      top: 5px;
+      left: 50%;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.22);
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.55);
     }
 
-    .palette-chip__swatch--a { background-image: url("img/mosaic/A.png"); }
-    .palette-chip__swatch--b { background-image: url("img/mosaic/B.png"); }
-    .palette-chip__swatch--c { background-image: url("img/mosaic/C.png"); }
-    .palette-chip__swatch--d { background-image: url("img/mosaic/D.png"); }
-    .palette-chip__swatch--x { background-image: url("img/mosaic/X.png"); }
-    .palette-chip__swatch--y { background-image: url("img/mosaic/Y.png"); }
-    .palette-chip__swatch--z { background-image: url("img/mosaic/Z.png"); }
+    .palette-chip__swatch--a { background: #f2f2f2; }
+    .palette-chip__swatch--b { background: #dcdcdc; }
+    .palette-chip__swatch--c { background: #bababa; }
+    .palette-chip__swatch--d { background: #9d9d9d; }
+    .palette-chip__swatch--x { background: #7c7c7c; }
+    .palette-chip__swatch--y { background: #474747; }
+    .palette-chip__swatch--z { background: #171717; }
 
     .instruction-photo {
       position: relative;
