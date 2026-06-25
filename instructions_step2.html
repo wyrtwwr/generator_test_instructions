@@ -1386,7 +1386,7 @@
         undoButton.disabled = stepHistory.length === 0;
       }
       if (redoButton) {
-        redoButton.disabled = redoHistory.length === 0 && !canAdvancePendingSelection();
+        redoButton.disabled = false;
       }
     }
 
@@ -1640,9 +1640,16 @@
       return null;
     }
 
+    function getForwardTargetCellIndex() {
+      if (Number.isInteger(currentSelectionEndIndex)) {
+        return getNextFreeCellIndex(currentSelectionEndIndex);
+      }
+
+      return getNextFreeCellIndex(null);
+    }
+
     function canAdvancePendingSelection() {
-      if (!Number.isInteger(currentSelectionEndIndex)) return false;
-      return getNextFreeCellIndex(currentSelectionEndIndex) !== null;
+      return getForwardTargetCellIndex() !== null;
     }
 
     function syncPendingRangeToCurrentSelection() {
@@ -1667,9 +1674,10 @@
     }
 
     function advancePendingSelection() {
-      if (!canAdvancePendingSelection()) return false;
+      const nextIndex = getForwardTargetCellIndex();
+      if (!Number.isInteger(nextIndex)) return false;
 
-      currentSelectionEndIndex = getNextFreeCellIndex(currentSelectionEndIndex);
+      currentSelectionEndIndex = nextIndex;
       syncPendingRangeToCurrentSelection();
       setDisplayModeActive(false);
       repaintBoardCells();
