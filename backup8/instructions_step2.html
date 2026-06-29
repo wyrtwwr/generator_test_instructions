@@ -1737,11 +1737,8 @@
     }
 
     function handleNextButtonClick() {
-      if (redoHistory.length > 0) {
-        redoLastStep();
-        return;
-      }
-      advancePendingSelection();
+      if (advancePendingSelection()) return;
+      redoLastStep();
     }
 
     function clearCurrentFragmentSelection() {
